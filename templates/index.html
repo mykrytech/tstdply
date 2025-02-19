@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>YouTube Music Downloader dengan yt-dlp</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,500&display=swap" rel="stylesheet">
+    <!-- Sertakan library Socket.IO -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.1/socket.io.min.js" crossorigin="anonymous"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            max-width: 500px;
+            width: 100%;
+            padding: 40px;
+            text-align: center;
+        }
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        form {
+            margin-top: 20px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus {
+            border-color: #667eea;
+            outline: none;
+        }
+        button {
+            background: #667eea;
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+            width: 100%;
+        }
+        button:hover {
+            background: #556cd6;
+        }
+        .message {
+            color: #e74c3c;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        .progress {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #333;
+        }
+        #status {
+            margin-top: 10px;
+            font-size: 16px;
+            color: green;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>YouTube Music Downloader</h1>
+        <!-- Agar halaman tidak reload penuh, bisa dipertimbangkan untuk memuat download lewat iframe tersembunyi -->
+        <form method="POST" action="/" onsubmit="showStatus()">
+            <input type="text" name="youtube_url" placeholder="Masukkan URL YouTube" required>
+            <button type="submit">Download</button>
+        </form>
+        <!-- Menampilkan pesan error/informasi -->
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <div class="message">
+              {% for message in messages %}
+                <p>{{ message }}</p>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+        <!-- Tempat untuk menampilkan progres (jika nanti diintegrasikan lebih lanjut) -->
+        <div class="progress" id="progress">Progress: 0%</div>
+        <!-- Tempat untuk menampilkan status unduhan -->
+        <div id="status"></div>
+    </div>
+    
+    <script>
+        function showStatus() {
+            document.getElementById('status').innerText = "Audio sedang di unduh, mohon tunggu...";
+        }
+        
+        var socket = io();
+        socket.on('download_progress', function(data) {
+            var progressElem = document.getElementById('progress');
+            progressElem.innerText = "Progress: " + data.percent.toFixed(2) + "%";
+            if(data.message) {
+                document.getElementById('status').innerText = data.message;
+            }
+        });
+        
+        // Optional: Debug koneksi Socket.IO
+        socket.on('connect', function() {
+            console.log("Socket connected.");
+        });
+    </script>
+</body>
+</html>
