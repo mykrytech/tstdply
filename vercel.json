@@ -14,7 +14,7 @@
   ],
   "functions": {
     "api/app.py": {
-      "includeFiles": ["ffmpeg/ffmpeg"]
+      "includeFiles": "ffmpeg/ffmpeg"
     }
   }
 }
