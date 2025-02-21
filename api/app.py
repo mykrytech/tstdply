@@ -52,6 +52,7 @@ def index():
                 'progress_hooks': [progress_hook],
                 'quiet': True,
                 'no_warnings': True,
+                'cookiefile': 'api/cookies.txt',
             }
 
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
