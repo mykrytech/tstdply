@@ -57,7 +57,7 @@ def index():
                     'preferredcodec': 'mp3',
                     'preferredquality': '192',
                 }],
-                'ffmpeg_location': ffmpeg_path,
+                'ffmpeg_location': '/usr/bin/ffmpeg',
                 'progress_hooks': [progress_hook],
                 'quiet': True,
                 'no_warnings': True,
