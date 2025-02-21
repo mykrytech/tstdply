@@ -1,5 +1,6 @@
 import os
 import tempfile
+import shutil
 from flask import Flask, request, render_template, send_file, redirect, url_for, flash
 import yt_dlp
 from flask_socketio import SocketIO
@@ -37,8 +38,16 @@ def index():
         try:
             # Membuat temporary directory untuk menyimpan file hasil download
             temp_dir = tempfile.mkdtemp()
-            # Template output: nama file akan disesuaikan dengan judul video dan ekstensi yang sesuai
             output_template = os.path.join(temp_dir, '%(title)s.%(ext)s')
+
+            # Salin cookies.txt ke folder sementara karena Vercel hanya mengizinkan akses di /tmp
+            cookie_source_path = os.path.join(base_dir, "api", "cookies.txt")
+            cookie_temp_path = "/tmp/cookies.txt"
+            try:
+                shutil.copy(cookie_source_path, cookie_temp_path)
+                print(f"Cookies berhasil disalin ke {cookie_temp_path}")
+            except Exception as e:
+                print(f"Kesalahan saat menyalin cookies.txt: {e}")
 
             ydl_opts = {
                 'format': 'bestaudio/best',
@@ -48,11 +57,11 @@ def index():
                     'preferredcodec': 'mp3',
                     'preferredquality': '192',
                 }],
-                'ffmpeg_location': ffmpeg_path,  # Gunakan path ffmpeg yang sudah dibundling
+                'ffmpeg_location': ffmpeg_path,
                 'progress_hooks': [progress_hook],
                 'quiet': True,
                 'no_warnings': True,
-                'cookiefile': 'api/cookies.txt',
+                'cookiefile': cookie_temp_path,  # Gunakan path cookies yang baru
             }
 
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
